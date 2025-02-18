@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.2" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.5.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BookStoreServer.Api.Entities\BookStoreServer.Api.Entities.csproj" />
+    <ProjectReference Include="..\BookStoreServer.Api.Shared\BookStoreServer.Api.Shared.csproj" />
+    <ProjectReference Include="..\BookStoreServer.CommonServices.Interface\BookStoreServer.CommonServices.Interface.csproj" />
+    <ProjectReference Include="..\BookStoreServer.CommonServices\BookStoreServer.CommonServices.csproj" />
+    <ProjectReference Include="..\BookStoreServer.Common\BookStoreServer.Common.csproj" />
+    <ProjectReference Include="..\BookStoreServer.Entities\BookStoreServer.Entities.csproj" />
+    <ProjectReference Include="..\BookStoreServer.Service\BookStoreServer.Service.csproj" />
+  </ItemGroup>
+
+</Project>
