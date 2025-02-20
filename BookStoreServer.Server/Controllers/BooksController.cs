@@ -1,8 +1,11 @@
 ﻿using BookStoreServer.Api.Entities.DTO;
+using BookStoreServer.Api.Entities.Response;
+using BookStoreServer.Hubs;
 using BookStoreServer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BookStoreServer.Controllers
 {
@@ -13,42 +16,52 @@ namespace BookStoreServer.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookService _bookService;
+        private readonly IHubContext<BookHub> _bookHub;
         private readonly ILogger<BooksController> _logger;
 
-        public BooksController(IBookService bookService, ILogger<BooksController> logger)
+        public BooksController(IBookService bookService, IHubContext<BookHub> bookHub, ILogger<BooksController> logger)
         {
             _bookService = bookService;
+            _bookHub = bookHub;
             _logger = logger;
 
         }
         [Authorize]
         [HttpGet]
-        public IActionResult GetAllBooks()
+        public ActionResult<BaseResponse> GetAll()
         {
             List<BookDTO> books = _bookService.GetAllBooks();
             _logger.LogError("GetAllBooks");
-                return Ok(books);
+            return Ok(books);
         }
         [Authorize]
         [HttpGet("{id}")]
-        public IActionResult GetBook([FromRoute] int id)
+        public IActionResult Get([FromRoute] int id)
         {
             BookDTO? book = _bookService.GetBook(id);
             return Ok(book);
         }
         [Authorize]
-        [HttpPost("setBook")]
-        public IActionResult SetBook([FromBody] BookDTO book)
+        [HttpPost("AddBook")]
+        public async Task<IActionResult> Set([FromBody] BookDTO book)
         {
-            BookDTO newBook = _bookService.SetBook(book);
+            BookDTO newBook = _bookService.AddBook(book);
+            await _bookHub.Clients.All.SendAsync("ReceiveBookNotification", $"📖 ספר חדש נוסף: {book.title}");
             return Created("api/books" + newBook.id, newBook);
         }
         [Authorize]
-        [HttpPut("updateBook/{id}")]
-        public IActionResult UpdateBook([FromBody] BookDTO book, [FromRoute] int id)
+        [HttpPut("{id}")]
+        public IActionResult Update([FromBody] BookDTO book, [FromRoute] int id)
         {
             BookDTO? newBook = _bookService.UpdateBook(id, book);
             return Ok(newBook);
+        }
+        [Authorize]
+        [HttpDelete("{id}")]
+        public IActionResult Delete([FromRoute] int id)
+        {
+            _bookService.DeleteBook(id);
+            return NoContent();
         }
         [Authorize]
         [HttpPatch("updateBookPrice/{id}")]
@@ -58,13 +71,7 @@ namespace BookStoreServer.Controllers
             BookDTO? newBook = _bookService.UpdateBookPrice(book);
             return Ok(newBook);
         }
-        [Authorize]
-        [HttpDelete("delete/{id}")]
-        public IActionResult DeleteBook([FromRoute] int id)
-        {
-            _bookService.DeleteBook(id);
-            return NoContent();
-        }
+
         [Authorize]
         [HttpGet("price-range")]
         public IActionResult getRangePriceOfBooks([FromQuery] decimal minPrice, [FromQuery] decimal maxPrice)
