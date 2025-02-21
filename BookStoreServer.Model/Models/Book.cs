@@ -11,11 +11,12 @@ namespace BookStoreServer.Model.Models
     [Table("Book")]
     public class Book
     {
-        public int id { get; set; }
-        public string title { get; set; } = null!;
+        public int Id { get; set; }
+        public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
         public DateTime PublishedDate { get; set; }
         [Column(TypeName = "money")]
-        public Decimal price { get; set; }
+        public Decimal Price { get; set; }
+        public int Amount { get; set; }
     }
 }

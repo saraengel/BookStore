@@ -10,14 +10,14 @@ using BookStoreServer.Services.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BookStoreServer.Service
+namespace BookStoreServer.Service.Services
 {
     public class JwtService : IJwtService
     {
         private readonly JWTSettings _JWTSettings;
         public JwtService(IOptions<JWTSettings> jwtSettings)
         {
-                _JWTSettings = jwtSettings.Value;
+            _JWTSettings = jwtSettings.Value;
         }
         public string GenerateToken(string userName)
         {

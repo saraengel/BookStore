@@ -1,4 +1,5 @@
 ﻿using BookStoreServer.Api.Entities.DTO;
+using BookStoreServer.Api.Entities.Response;
 using BookStoreServer.Service;
 using BookStoreServer.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -17,10 +18,10 @@ namespace BookStoreServer.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetUsers()
+        public BaseGetListResponse<UserDTO> GetUsers()
         {
-            List<UserDTO> users = _userService.GetUsers();
-            return Ok(users);
+           return _userService.GetUsers();
+           
         }
     }
 }

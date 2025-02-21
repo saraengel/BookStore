@@ -6,15 +6,14 @@ using System.Threading.Tasks;
 
 namespace BookStoreServer.Api.Entities.DTO
 {
-    public class BookDTO
+    public class OrderDTO
     {
-      
         public int Id { get; set; }
-        public string? Title { get; set; }
-        public string? Description { get; set; }
-        public DateTime PublishedDate { get; set; }
-        public Decimal price { get; set; }
+        public int BookId { get; set; }
+        public int UserId { get; set; }
         public int Amount { get; set; }
+        public OrderStatus Status { get; set; }
+        public bool IsValid { get; set; }
 
     }
 }

@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BookStoreServer.Api.Entities.DTO;
+using BookStoreServer.Api.Entities.Response;
 
 namespace BookStoreServer.Services.Interfaces
 {
     public interface IUserService
     {
-        public List<UserDTO> GetUsers();
+        public BaseGetListResponse<UserDTO> GetUsers();
     }
 }

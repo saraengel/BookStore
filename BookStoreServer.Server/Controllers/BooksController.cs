@@ -1,6 +1,6 @@
 ﻿using BookStoreServer.Api.Entities.DTO;
+using BookStoreServer.Api.Entities.Request;
 using BookStoreServer.Api.Entities.Response;
-using BookStoreServer.Hubs;
 using BookStoreServer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -12,72 +12,60 @@ namespace BookStoreServer.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class BooksController : ControllerBase
     {
         private readonly IBookService _bookService;
-        private readonly IHubContext<BookHub> _bookHub;
         private readonly ILogger<BooksController> _logger;
 
-        public BooksController(IBookService bookService, IHubContext<BookHub> bookHub, ILogger<BooksController> logger)
+        public BooksController(IBookService bookService, ILogger<BooksController> logger)
         {
             _bookService = bookService;
-            _bookHub = bookHub;
             _logger = logger;
-
         }
-        [Authorize]
+        //[Authorize]
         [HttpGet]
-        public ActionResult<BaseResponse> GetAll()
+        public ActionResult<BaseGetListResponse<BookDTO>> GetAll()
         {
-            List<BookDTO> books = _bookService.GetAllBooks();
-            _logger.LogError("GetAllBooks");
-            return Ok(books);
+            return _bookService.GetAllBooks();
         }
-        [Authorize]
+        //[Authorize]
         [HttpGet("{id}")]
-        public IActionResult Get([FromRoute] int id)
+        public  ActionResult<BaseGetEntityResponse<BookDTO>> Get([FromRoute] int id)
         {
-            BookDTO? book = _bookService.GetBook(id);
-            return Ok(book);
+            return _bookService.GetBook(id);
         }
-        [Authorize]
-        [HttpPost("AddBook")]
-        public async Task<IActionResult> Set([FromBody] BookDTO book)
+        //[Authorize]
+        [HttpPost]
+        public ActionResult<BaseGetEntityResponse<BookDTO>> Set([FromBody] BaseEntityRequest<BookDTO> book)
         {
-            BookDTO newBook = _bookService.AddBook(book);
-            await _bookHub.Clients.All.SendAsync("ReceiveBookNotification", $"📖 ספר חדש נוסף: {book.title}");
-            return Created("api/books" + newBook.id, newBook);
+            return _bookService.AddBook(book);
+            //await _bookHub.Clients.All.SendAsync("ReceiveBookNotification", $"📖 ספר חדש נוסף: {book.title}");
         }
-        [Authorize]
-        [HttpPut("{id}")]
-        public IActionResult Update([FromBody] BookDTO book, [FromRoute] int id)
+        //[Authorize]
+        [HttpPut]
+        public ActionResult<BaseGetEntityResponse<BookDTO>> Update([FromBody]BaseEntityRequest<BookDTO> request)
         {
-            BookDTO? newBook = _bookService.UpdateBook(id, book);
-            return Ok(newBook);
+            return _bookService.UpdateBook( request);
         }
-        [Authorize]
+        //[Authorize]
         [HttpDelete("{id}")]
         public IActionResult Delete([FromRoute] int id)
         {
             _bookService.DeleteBook(id);
             return NoContent();
         }
-        [Authorize]
+        //[Authorize]
         [HttpPatch("updateBookPrice/{id}")]
-        public IActionResult UpdateBookPrice([FromBody] BookDTO book, [FromRoute] int id)
+        public ActionResult<BaseGetEntityResponse<BookDTO>> UpdateBookPrice([FromBody] BaseEntityRequest<BookDTO> request)
         {
-            book.id = id;
-            BookDTO? newBook = _bookService.UpdateBookPrice(book);
-            return Ok(newBook);
+            return _bookService.UpdateBookPrice(request);
         }
-
-        [Authorize]
+        //[Authorize]
         [HttpGet("price-range")]
-        public IActionResult getRangePriceOfBooks([FromQuery] decimal minPrice, [FromQuery] decimal maxPrice)
+        public ActionResult<BaseGetListResponse<BookDTO>> getRangePriceOfBooks([FromQuery] RangePriceRequest request)
         {
-            List<BookDTO>? books = _bookService.GetRangePriceOfBooks(minPrice, maxPrice);
-            return Ok(books);
+            return _bookService.GetRangePriceOfBooks(request);
         }
     }
 }

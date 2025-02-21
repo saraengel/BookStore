@@ -3,7 +3,6 @@ using BookStoreServer.Model.Contexts;
 using BookStoreServer.Repository;
 using BookStoreServer.Repository.AutoMapper;
 using BookStoreServer.Repository.Interfaces;
-using BookStoreServer.Service;
 using BookStoreServer.Service.Cache;
 using BookStoreServer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +15,8 @@ using System.Text;
 using BookStoreServer.Entities.AppSettings;
 using Microsoft.OpenApi.Models;
 using BookStoreServer.CommonServices;
+using Microsoft.AspNetCore.Builder;
+using BookStoreServer.Service.Services;
 
 
 namespace BookStoreServer.Server
@@ -75,7 +76,8 @@ namespace BookStoreServer.Server
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
                 };
             });
-            builder.Services.AddHostedService<OldBooksCleanupService>();
+            //builder.Services.AddHostedService<OldBooksCleanupService>();
+            builder.Services.AddSignalR();
             builder.Services.AddScoped<IBookRepository, BookRepository>();
             builder.Services.AddScoped<IBookService, BookService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -84,10 +86,19 @@ namespace BookStoreServer.Server
             builder.Services.Configure<JWTSettings>(config.GetSection("Jwt"));
             builder.Services.AddScoped<IJwtService, JwtService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddSingleton<IBookHub, BookHubNotifier>();
+            builder.Services.AddSingleton<SignalRClientService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             //builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(ctx.Configuration));
 
           
             var app = builder.Build();
+
+            app.UseRouting();
+
+            app.MapControllers();
+            app.MapHub<BookHub>("/book-hub");
             if (app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/error-development");
@@ -100,7 +111,8 @@ namespace BookStoreServer.Server
             }
             app.UseAuthentication();
             app.UseAuthorization();
-            app.MapControllers();
+           
+      
             app.Run();
         }
     }

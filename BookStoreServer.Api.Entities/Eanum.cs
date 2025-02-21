@@ -10,7 +10,15 @@ namespace BookStoreServer.Api.Entities
     {
         Succeeded = 1,
         NotSucceeded = 2,
-        Unauthorized = 3
+        Unauthorized = 3,
+        Created = 4,
+    }
+    public enum OrderStatus
+    {
+        Pending = 0,
+        Processing = 1,
+        Completed = 2,
+
     }
 
 }

@@ -5,10 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using BookStoreServer.Api.Entities.DTO;
+using BookStoreServer.Api.Entities.Request;
+using BookStoreServer.Api.Entities.Response;
 using BookStoreServer.Model.Contexts;
 using BookStoreServer.Model.Models;
 using BookStoreServer.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BookStoreServer.Repository
 {
@@ -24,53 +27,53 @@ namespace BookStoreServer.Repository
         public List<BookDTO> GetAllBooks()
         {
             List<Book> books = _db.Books.ToList();
-            
+            if (books.Count == 0) return null;            
             return _mapper.Map<List<BookDTO>>(books);
         }
         public BookDTO? GetBook(int id)
         {
-            var book = _db.Books.SingleOrDefault(b => b.id == id);
+            var book = _db.Books.SingleOrDefault(b => b.Id == id);
+            if(book == null) return null;
             return _mapper.Map<BookDTO>(book);
 
         }
-        public BookDTO SetBook(BookDTO bookDTO)
+        public BookDTO AddBook(BaseEntityRequest<BookDTO> request)
         {
-            var book = _mapper.Map<Book>(bookDTO);
+            var book = _mapper.Map<Book>(request.Entity);
             _db.Books.Add(book);
             _db.SaveChanges();
-            //return bookDTO;
             return _mapper.Map<BookDTO>(book);
 
         }
-        public BookDTO? UpdateBook(int id,BookDTO bookDTO)
+        public BookDTO? UpdateBook(BaseEntityRequest<BookDTO> request)
         {
-
-            Book? book = _db.Books.Find(id);
+            Book? book = _db.Books.Find(request.Entity.Id);
             if (book == null) return null;
-            _mapper.Map(bookDTO, book);
+            _mapper.Map(request.Entity, book);
             _db.SaveChanges();
             return _mapper.Map<BookDTO>(book);
         }
-        public BookDTO? UpdateBookPrice(BookDTO bookDTO)
+        public BookDTO? UpdateBookPrice(BaseEntityRequest<BookDTO> request)
         {
-            Book? book = _mapper.Map<Book>(GetBook(bookDTO.id));
+            Book? book = _mapper.Map<Book>(GetBook(request.Entity.Id));
             if (book == null) return null;
-            book.price = book.price;
+            book.Price = book.Price;
             _db.SaveChanges();
-            return bookDTO;
+            return _mapper.Map<BookDTO>(book);
         }
         public void DeleteBook(int id)
         {
-            var book = _db.Books.SingleOrDefault(b=>b.id==id);
+            var book = _db.Books.SingleOrDefault(b=>b.Id==id);
             if (book == null) return;
             _db.Books.Remove(book);
             _db.SaveChanges();
 
         }
-        public List<BookDTO>? GetRangePriceOfBooks(decimal minPrice, decimal MaxPrice)
+        public List<BookDTO> GetRangePriceOfBooks(RangePriceRequest request)
         {
-            List<Book> books =  _db.Books.Where(b => b.price > minPrice && b.price < MaxPrice).ToList();
-             return _mapper.Map<List<BookDTO>>(books);
+            List<Book> books =  _db.Books.Where(b => b.Price > request.MinPrice && b.Price < request.MaxPrice).ToList();
+            if (books.Count==0) return null;
+            return _mapper.Map<List<BookDTO>>(books);
         }
         public async Task<List<BookDTO>> GetOldBooksAsync(DateTime date)
         {

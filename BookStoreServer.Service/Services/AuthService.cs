@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BookStoreServer.Api.Entities.DTO;
 using BookStoreServer.Api.Entities.Models;
+using BookStoreServer.Api.Entities.Request;
 using BookStoreServer.Entities;
 using BookStoreServer.Entities.AppSettings;
 using BookStoreServer.Repository.Interfaces;
@@ -16,7 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BookStoreServer.Service
+namespace BookStoreServer.Service.Services
 {
     public class AuthService : IAuthService
     {
@@ -27,12 +28,12 @@ namespace BookStoreServer.Service
             _userRepository = userRepository;
             _JWTService = jwtService;
         }
-        public string Login(string userName, string password)
+        public string Login(LoginRequest request)
         {
-            var user = GetUser(userName);
-            if(user == null) { return null;}
+            var user = GetUser(request.Username);
+            if (user == null) { return null; }
             //check validation
-           return _JWTService.GenerateToken(userName);
+            return _JWTService.GenerateToken(request.Username);
             //CreateSession(user, userName);
         }
 
@@ -43,7 +44,7 @@ namespace BookStoreServer.Service
         }
         public UserDTO GetUser(string username)
         {
-           return _userRepository.GetUserByUserName(username);
+            return _userRepository.GetUserByUserName(username);
         }
         //public void CreateSession(UserDTO user, string userName) {  
         //     string sessionId = Guid.NewGuid().ToString();

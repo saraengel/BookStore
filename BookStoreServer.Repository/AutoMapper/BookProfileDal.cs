@@ -15,6 +15,7 @@ namespace BookStoreServer.Repository.AutoMapper
         {
             CreateMap<Book, BookDTO>().ReverseMap();
             CreateMap<User, UserDTO>().ReverseMap();
+            CreateMap<Order, OrderDTO>().ReverseMap();
         }
     }
 }

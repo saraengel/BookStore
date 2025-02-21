@@ -1,4 +1,5 @@
-﻿using BookStoreServer.Services.Interfaces;
+﻿using BookStoreServer.Api.Entities.Request;
+using BookStoreServer.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,9 +16,9 @@ namespace BookStoreServer.Controllers
         }
         [HttpPost]
         [Route("/login")]
-        public ActionResult Login(string username, string password)
+        public ActionResult Login(LoginRequest request)
         {
-            string token = _authService.Login(username, password);
+            string token = _authService.Login(request);
             return Ok(new {Token = token});
         }
         [HttpPost]
