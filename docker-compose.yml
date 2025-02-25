@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  sqlserver:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "Str0ngP@ss!"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express" 
+    ports:
+      - "1433:1433"
+    networks:
+      - app_network
+
+  bookstoreserver:
+    build:
+      context: ./BookStoreServer
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - app_network
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=BookStore;User Id=sa;Password=Str0ngP@ss!;Encrypt=False;TrustServerCertificate=True;
+    depends_on:
+      - sqlserver
+      - deliveryservice 
+      
+networks:
+  app_network:
+    driver: bridge
