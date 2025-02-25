@@ -11,13 +11,13 @@
 
 //namespace BookStoreServer.CommonServices
 //{
-//    public class OldBooksCleanupService : BackgroundService
+//    public class HandleLowStockBooks : BackgroundService
 //    {
 //        private readonly IServiceProvider _serviceProvider;
-//        private readonly ILogger<OldBooksCleanupService> _logger;
+//        private readonly ILogger<HandleLowStockBooks> _logger;
 //        private readonly SignalRClientService _signalRClientService;
 
-//        public OldBooksCleanupService(IServiceProvider serviceProvider, ILogger<OldBooksCleanupService> logger)
+//        public HandleLowStockBooks(IServiceProvider serviceProvider, ILogger<HandleLowStockBooks> logger)
 //        {
 //            _serviceProvider = serviceProvider;
 //            _logger = logger;
@@ -25,7 +25,7 @@
 
 //        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 //        {
-//            _logger.LogInformation(" OldBooksCleanupService srated");
+//            _logger.LogInformation(" HandleLowStockBooks srated");
 
 //            while (!stoppingToken.IsCancellationRequested)
 //            {

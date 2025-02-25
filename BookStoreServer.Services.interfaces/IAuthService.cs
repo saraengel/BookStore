@@ -9,7 +9,7 @@ namespace BookStoreServer.Services.Interfaces
 {
     public interface IAuthService
     {
-        public string Login(LoginRequest request);
+        public Task<string> Login(LoginRequest request);
         public void Logout();
     }
 }

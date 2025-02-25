@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookStoreServer", "BookStoreServer.Server\BookStoreServer.csproj", "{913A218F-0823-47AE-9AA7-3676318CCAB1}"
 EndProject
@@ -26,6 +26,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookStoreServer.CommonServices", "BookStoreServer.CommonServices\BookStoreServer.CommonServices.csproj", "{16A65773-E4FC-4930-9C08-FB0231661A4E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookStoreServer.CommonServices.Interface", "BookStoreServer.CommonServices.Interface\BookStoreServer.CommonServices.Interface.csproj", "{DD225084-2811-48D3-9229-9E4A97D9582D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{05297287-0352-4B0F-BA1A-427FB8003038}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		DockerFile.txt = DockerFile.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

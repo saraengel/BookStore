@@ -13,29 +13,26 @@ namespace BookStoreServer.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
+
         public OrderController(IOrderService orderService)
         {
-            _orderService = orderService;  
+            _orderService = orderService;
         }
 
         [HttpGet]
-        public ActionResult<BaseGetListResponse<OrderDTO>> Get()
+        public async Task<ActionResult<BaseGetListResponse<OrderDTO>>> Get()
         {
-            return _orderService.GetAll();
-           
+            return await _orderService.GetAllAsync();
         }
+
         [HttpPost]
-        public ActionResult<BaseResponse> Set([FromBody] OrderRequest request)
+        public async Task<ActionResult<BaseGetEntityResponse<OrderDTO>>> Set([FromBody] OrderRequest request)
         {
-            _orderService.AddOrder(request);
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return await _orderService.AddOrderAsync(request);
         }
-        [HttpPost("ProcessOrdersAsync") ]
-        public async Task<IActionResult> ProcessOrdersAsync()
-        {
-           await _orderService.ProcessOrdersAsync();
-            return Ok();
-        }
-        
     }
 }

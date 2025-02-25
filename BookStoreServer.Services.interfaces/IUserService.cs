@@ -10,6 +10,6 @@ namespace BookStoreServer.Services.Interfaces
 {
     public interface IUserService
     {
-        public BaseGetListResponse<UserDTO> GetUsers();
+        public Task<BaseGetListResponse<UserDTO>> GetUsersAsync();
     }
 }

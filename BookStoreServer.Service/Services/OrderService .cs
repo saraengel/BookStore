@@ -15,6 +15,8 @@ using BookStoreServer.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
 namespace BookStoreServer.Service.Services
 {
@@ -22,66 +24,51 @@ namespace BookStoreServer.Service.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IBookRepository _bookRepository;
-        private readonly ConcurrentBag<OrderDTO> _orders = new ConcurrentBag<OrderDTO>();
+        private readonly IHubContext<StoreHub> _orderHub;
+        private readonly ILogger<OrderService> _logger;
 
-
-        public OrderService(IOrderRepository orderRepository, IBookRepository bookRepository)
+        public OrderService(IOrderRepository orderRepository, IBookRepository bookRepository, IHubContext<StoreHub> orderHub, ILogger<OrderService> logger)
         {
             _orderRepository = orderRepository;
             _bookRepository = bookRepository;
+            _orderHub = orderHub;
+            _logger = logger;
         }
-      
-        public BaseGetListResponse<OrderDTO> GetAll()
-        {
-            List <OrderDTO> orders = _orderRepository.GetAll();
-            return new BaseGetListResponse<OrderDTO>() { Entities = orders };
-        }
-        public void AddOrder(OrderRequest request)
-        {
-           OrderDTO order  = _orderRepository.AddOrder(request);
-            _orders.Add(order);
-        }
-        public async Task ProcessOrdersAsync()
-        {
-            Task validationTask = Task.Run(() => ValidateOrders());
-            Task processingTask = Task.Run(() => ProcessValidOrders());
-            await Task.WhenAll(validationTask, processingTask);
-            Console.WriteLine("All orders processed");
-        }
-        public void ValidateOrders()
-        {
-            while (!_orders.IsEmpty)
-            {
-                if (_orders.TryTake(out OrderDTO order))
-                {
-                  BookDTO bookDTO =  _bookRepository.GetBook(order.BookId);
-                    if (bookDTO == null) return;
-                    if (bookDTO.Amount >= order.Amount)
-                    {
-                        _orderRepository.setValidation(order.Id, true);
-                    }
-                }
-            }
-        }
-        public  void ProcessValidOrders()
-        {
-            Console.WriteLine("Processing Orders...");
-        
-            while (!_orders.IsEmpty)
-            {
-                foreach(OrderDTO order in _orders )
-                {
-                    if (order.IsValid)
-                    {
-                        Console.WriteLine($"Processing Order Id: {order.Id}");
-                        _orderRepository.UpdateStatus(order.Id, OrderStatus.Processing);// update status in DB
 
-                        Task.Delay(2000);  //  סימולציה של עיבוד
-                        _orderRepository.UpdateStatus(order.Id, OrderStatus.Completed);// update status in DB
-                    }
-                }
+        public async Task<BaseGetListResponse<OrderDTO>> GetAllAsync()
+        {
+            try
+            {
+                List<OrderDTO> orders = await _orderRepository.GetAllAsync();
+                return new BaseGetListResponse<OrderDTO> { Entities = orders, Succeeded = true };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while getting all orders.");
+                return new BaseGetListResponse<OrderDTO> { Succeeded = false, ErrorMessage = "An error occurred while retrieving orders." };
             }
         }
 
+        public async Task<BaseGetEntityResponse<OrderDTO>> AddOrderAsync(OrderRequest request)
+        {
+            try
+            {
+                // Validate request
+                if (request == null || request.Amount <= 0)
+                {
+                    return new BaseGetEntityResponse<OrderDTO> { Succeeded = false, ErrorMessage = "Invalid order request." };
+                }
+
+                OrderDTO order = await _orderRepository.AddOrderAsync(request);
+                //await _orderHub.Clients.All.SendAsync("OrderValidated", order.Id);
+
+                return new BaseGetEntityResponse<OrderDTO> { Entity = order, Succeeded = true };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while adding an order.");
+                return new BaseGetEntityResponse<OrderDTO> { Succeeded = false, ErrorMessage = "An error occurred while adding the order." };
+            }
+        }
     }
 }

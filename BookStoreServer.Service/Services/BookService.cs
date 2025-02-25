@@ -10,53 +10,138 @@ using BookStoreServer.Api.Entities.Response;
 using BookStoreServer.Model.Contexts;
 using BookStoreServer.Repository.Interfaces;
 using BookStoreServer.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace BookStoreServer.Service.Services
 {
     public class BookService : IBookService
     {
         private readonly IBookRepository _bookRepository;
-        private readonly IBookHub _bookHubService;
+        private readonly ILogger<BookService> _logger;
 
-        public BookService(IBookRepository bookRepository, IBookHub bookHub)
+        public BookService(IBookRepository bookRepository, ILogger<BookService> logger)
         {
             _bookRepository = bookRepository;
-            _bookHubService = bookHub;
+            _logger = logger;
         }
 
-        public BaseGetListResponse<BookDTO> GetAllBooks()
+        public async Task<BaseGetListResponse<BookDTO>> GetAllBooksAsync()
         {
-            List<BookDTO> books = _bookRepository.GetAllBooks();
-            return new BaseGetListResponse<BookDTO>() { Entities = books };
+            try
+            {
+                List<BookDTO> books = await _bookRepository.GetAllBooksAsync();
+                return new BaseGetListResponse<BookDTO> { Entities = books };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while getting all books.");
+                return new BaseGetListResponse<BookDTO> { Succeeded = false, ErrorMessage = ex.Message };
+            }
         }
-        public BaseGetEntityResponse<BookDTO> GetBook(int id)
+
+        public async Task<BaseGetEntityResponse<BookDTO>> GetBookAsync(int id)
         {
-            BookDTO book = _bookRepository.GetBook(id);
-            return new BaseGetEntityResponse<BookDTO>() { Entity = book };
+            try
+            {
+                BookDTO book = await _bookRepository.GetBookAsync(id);
+                return new BaseGetEntityResponse<BookDTO> { Entity = book };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error occurred while getting book with id {id}.");
+                return new BaseGetEntityResponse<BookDTO> { Succeeded = false, ErrorMessage = ex.Message };
+            }
         }
-        public BaseGetEntityResponse<BookDTO> AddBook(BaseEntityRequest<BookDTO> request)
+
+        public async Task<BaseGetEntityResponse<BookDTO>> AddBookAsync(BaseEntityRequest<BookDTO> request)
         {
-            BookDTO book = _bookRepository.AddBook(request);
-            return new BaseGetEntityResponse<BookDTO>() { Entity = book, Status = ResponseStatus.Created };
+            try
+            {
+                ValidateBook(request.Entity);
+                BookDTO book = await _bookRepository.AddBookAsync(request);
+                return new BaseGetEntityResponse<BookDTO> { Entity = book, Status = ResponseStatus.Created };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while adding a book.");
+                return new BaseGetEntityResponse<BookDTO> { Succeeded = false, ErrorMessage = ex.Message };
+            }
         }
-        public BaseGetEntityResponse<BookDTO> UpdateBook(BaseEntityRequest<BookDTO> request)
+
+        public async Task<BaseGetEntityResponse<BookDTO>> UpdateBookAsync(BaseEntityRequest<BookDTO> request)
         {
-            BookDTO book = _bookRepository.UpdateBook(request);
-            return new BaseGetEntityResponse<BookDTO> { Entity = book };
+            try
+            {
+                ValidateBook(request.Entity);
+                BookDTO book = await _bookRepository.UpdateBookAsync(request);
+                return new BaseGetEntityResponse<BookDTO> { Entity = book };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while updating a book.");
+                return new BaseGetEntityResponse<BookDTO> { Succeeded = false, ErrorMessage = ex.Message };
+            }
         }
-        public BaseGetEntityResponse<BookDTO> UpdateBookPrice(BaseEntityRequest<BookDTO> request)
+
+        public async Task<BaseGetEntityResponse<BookDTO>> UpdateBookPriceAsync(BaseEntityRequest<BookDTO> request)
         {
-            BookDTO book = _bookRepository.UpdateBookPrice(request);
-            return new BaseGetEntityResponse<BookDTO> { Entity = book };
+            try
+            {
+                if (request.Entity.Price <= 0)
+                {
+                    throw new ArgumentException("Price must be greater than 0.");
+                }
+                BookDTO book = await _bookRepository.UpdateBookPriceAsync(request);
+                return new BaseGetEntityResponse<BookDTO> { Entity = book };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while updating book price.");
+                return new BaseGetEntityResponse<BookDTO> { Succeeded = false, ErrorMessage = ex.Message };
+            }
         }
-        public void DeleteBook(int id)
+
+        public async Task DeleteBookAsync(int id)
         {
-            _bookRepository.DeleteBook(id);
+            try
+            {
+                await _bookRepository.DeleteBookAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error occurred while deleting book with id {id}.");
+                throw;
+            }
         }
-        public BaseGetListResponse<BookDTO> GetRangePriceOfBooks(RangePriceRequest request)
+
+        public async Task<BaseGetListResponse<BookDTO>> GetRangePriceOfBooksAsync(RangePriceRequest request)
         {
-            List<BookDTO> books = _bookRepository.GetRangePriceOfBooks(request);
-            return new BaseGetListResponse<BookDTO>() { Entities = books };
+            try
+            {
+                List<BookDTO> books = await _bookRepository.GetRangePriceOfBooksAsync(request);
+                return new BaseGetListResponse<BookDTO> { Entities = books };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while getting books in price range.");
+                return new BaseGetListResponse<BookDTO> { Succeeded = false, ErrorMessage = ex.Message };
+            }
+        }
+
+        private void ValidateBook(BookDTO book)
+        {
+            if (string.IsNullOrWhiteSpace(book.Title))
+            {
+                throw new ArgumentException("Title is required.");
+            }
+            if (book.Price <= 0)
+            {
+                throw new ArgumentException("Price must be greater than 0.");
+            }
+            if (book.Amount <= 0)
+            {
+                throw new ArgumentException("Amount must be greater than 0.");
+            }
         }
     }
 }

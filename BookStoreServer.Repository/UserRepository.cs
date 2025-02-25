@@ -12,25 +12,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreServer.Repository
 {
-    public class UserRepository: IUserRepository
+    public class UserRepository : IUserRepository
     {
         private readonly BookStorContext _db;
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
+
         public UserRepository(BookStorContext db, IMapper mapper)
         {
             _db = db;
             _mapper = mapper;
         }
-        public UserDTO GetUserByUserName(string userName)
+
+        public async Task<UserDTO> GetUserByUserNameAsync(string userName)
         {
-            var user = _db.Users.SingleOrDefault(u => u.UserName == userName);
+            var user = await _db.Users.SingleOrDefaultAsync(u => u.UserName == userName);
             if (user == null) { return null; }
             return _mapper.Map<UserDTO>(user);
         }
-        public List<UserDTO> GetUsers(){
-            List<User> users = _db.Users.ToList();
+
+        public async Task<List<UserDTO>> GetUsersAsync()
+        {
+            var users = await _db.Users.ToListAsync();
             return _mapper.Map<List<UserDTO>>(users);
         }
-       
     }
 }

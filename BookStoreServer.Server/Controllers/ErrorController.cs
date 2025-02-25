@@ -9,21 +9,24 @@ namespace BookStoreServer.Controllers
     public class ErrorController : ControllerBase
     {
         private readonly ILogger<ErrorController> _logger;
+
         public ErrorController(ILogger<ErrorController> logger)
         {
-                _logger = logger;
+            _logger = logger;
         }
+
         [ApiExplorerSettings(IgnoreApi = true)]
         [Route("/error-development")]
         public IActionResult HandleErrorOnDevelopment([FromServices] IHostEnvironment env)
         {
             LogError();
-            var exeptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>();
+            var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>();
             return Problem(
-                detail: exeptionHandlerFeature?.Error?.StackTrace,
-                title: exeptionHandlerFeature?.Error?.Message);
+                detail: exceptionHandlerFeature?.Error?.StackTrace,
+                title: exceptionHandlerFeature?.Error?.Message);
         }
-        [ApiExplorerSettings(IgnoreApi =true)]
+
+        [ApiExplorerSettings(IgnoreApi = true)]
         [Route("/error")]
         public IActionResult HandleError()
         {
@@ -33,11 +36,10 @@ namespace BookStoreServer.Controllers
 
         private void LogError()
         {
-            var exeptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>();
-            if (exeptionHandlerFeature != null)
+            var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>();
+            if (exceptionHandlerFeature != null)
             {
-                _logger.LogError($"an unexpected error accured in EventMaster API {exeptionHandlerFeature?.Path}{exeptionHandlerFeature?.Error.ToString()}{exeptionHandlerFeature?.Error?.StackTrace}");
-
+                _logger.LogError($"An unexpected error occurred in BookStore API: {exceptionHandlerFeature.Path} {exceptionHandlerFeature.Error} {exceptionHandlerFeature.Error?.StackTrace}");
             }
         }
     }

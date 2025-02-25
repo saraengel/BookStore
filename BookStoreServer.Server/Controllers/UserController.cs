@@ -12,16 +12,18 @@ namespace BookStoreServer.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly ILogger<UserController> _logger;
+
+        public UserController(IUserService userService, ILogger<UserController> logger)
         {
-                _userService = userService;
+            _userService = userService;
+            _logger = logger;
         }
 
         [HttpGet]
-        public BaseGetListResponse<UserDTO> GetUsers()
+        public async Task<ActionResult<BaseGetListResponse<UserDTO>>> GetUsers()
         {
-           return _userService.GetUsers();
-           
+           return await _userService.GetUsersAsync();         
         }
     }
 }

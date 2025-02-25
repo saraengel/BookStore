@@ -9,12 +9,20 @@ using BookStoreServer.Model.Models;
 
 namespace BookStoreServer.Repository.AutoMapper
 {
-    public class BookProfileDal:Profile
+    /// <summary>
+    /// AutoMapper profile for mapping between domain models and DTOs.
+    /// </summary>
+    public class BookProfileDal : Profile
     {
         public BookProfileDal()
         {
+            // Mapping between Book and BookDTO
             CreateMap<Book, BookDTO>().ReverseMap();
+
+            // Mapping between User and UserDTO
             CreateMap<User, UserDTO>().ReverseMap();
+
+            // Mapping between Order and OrderDTO
             CreateMap<Order, OrderDTO>().ReverseMap();
         }
     }

@@ -12,47 +12,115 @@ using BookStoreServer.Entities;
 using BookStoreServer.Model.Contexts;
 using BookStoreServer.Model.Models;
 using BookStoreServer.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BookStoreServer.Repository
 {
-    public class OrderRepository: IOrderRepository
+    public class OrderRepository : IOrderRepository
     {
         private readonly BookStorContext _db;
-        private IMapper _mapper;
-        public OrderRepository(BookStorContext db, IMapper mapper)
+        private readonly IMapper _mapper;
+        private readonly ILogger<OrderRepository> _logger;
+
+        public OrderRepository(BookStorContext db, IMapper mapper, ILogger<OrderRepository> logger)
         {
             _db = db;
             _mapper = mapper;
+            _logger = logger;
         }
-        public List<OrderDTO> GetAll()
+
+        public async Task<List<OrderDTO>> GetAllAsync()
         {
-            return _mapper.Map<List<OrderDTO>>(_db.Orders);
+            try
+            {
+                var orders = await _db.Orders.ToListAsync();
+                return _mapper.Map<List<OrderDTO>>(orders);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching all orders");
+                throw;
+            }
         }
-        public OrderDTO AddOrder(OrderRequest request)
+
+        public async Task<OrderDTO> AddOrderAsync(OrderRequest request)
         {
-            Book book = _db.Books.Where(b => b.Title == request.BookTitle).SingleOrDefault();
-            Order order = new Order() { 
-                BookId = book.Id,
-                UserId = request.UserId,
-                Amount = request.Amount
-            };
-             _db.Orders.Add(order);
-             _db.SaveChanges();
-            return _mapper.Map<OrderDTO>(order);
+            try
+            {
+                var book = await _db.Books
+                    .Where(b => b.Title == request.BookTitle && b.Amount >= request.Amount)
+                    .SingleOrDefaultAsync();
+
+                if (book == null)
+                {
+                    throw new InvalidOperationException("Book not found or insufficient amount");
+                }
+
+                var order = new Order
+                {
+                    BookId = book.Id,
+                    UserId = request.UserId,
+                    Amount = request.Amount,
+                    Status = OrderStatus.Pending,
+                    IsValid = true
+                };
+
+                book.Amount -= request.Amount;
+
+                await _db.Orders.AddAsync(order);
+                _db.Books.Update(book);
+                await _db.SaveChangesAsync();
+
+                return _mapper.Map<OrderDTO>(order);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding order");
+                throw;
+            }
         }
-        public void UpdateStatus(int orderId, OrderStatus status)
+
+        public async Task UpdateStatusAsync(int orderId, OrderStatus status)
         {
-            Order order =  _db.Orders.Find(orderId);
-            if (order == null) return;
-            order.Status = status;
-             _db.SaveChanges();   
+            try
+            {
+                var order = await _db.Orders.FindAsync(orderId);
+                if (order == null)
+                {
+                    _logger.LogWarning("Order not found: {OrderId}", orderId);
+                    return;
+                }
+
+                order.Status = status;
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating order status");
+                throw;
+            }
         }
-        public void setValidation(int orderId, bool isValid)
+
+        public async Task SetValidationAsync(int orderId, bool isValid)
         {
-            Order order = _db.Orders.Find(orderId);
-            if (order == null) return;
-            order.IsValid = isValid;
-            _db.SaveChanges();
+            try
+            {
+                var order = await _db.Orders.FindAsync(orderId);
+                if (order == null)
+                {
+                    _logger.LogWarning("Order not found: {OrderId}", orderId);
+                    return;
+                }
+
+                order.IsValid = isValid;
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error setting order validation");
+                throw;
+            }
         }
     }
 }

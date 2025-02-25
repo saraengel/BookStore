@@ -15,26 +15,43 @@ namespace BookStoreServer.Service.Services
     public class JwtService : IJwtService
     {
         private readonly JWTSettings _JWTSettings;
+
         public JwtService(IOptions<JWTSettings> jwtSettings)
         {
             _JWTSettings = jwtSettings.Value;
         }
-        public string GenerateToken(string userName)
+
+        public string GenerateToken(string userName, IEnumerable<Claim> additionalClaims = null)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_JWTSettings.Key);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            try
             {
-                Subject = new ClaimsIdentity(new Claim[]
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_JWTSettings.Key);
+                var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, userName)
+                    };
+
+                if (additionalClaims != null)
                 {
-                    new Claim(ClaimTypes.Name, userName)
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(30),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var userToken = tokenHandler.WriteToken(token);
-            return userToken;
+                    claims.AddRange(additionalClaims);
+                }
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(claims),
+                    Expires = DateTime.UtcNow.AddMinutes(_JWTSettings.TokenExpirationInMinutes),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                return tokenHandler.WriteToken(token);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (logging mechanism not shown here)
+                throw new ApplicationException("Error generating JWT token", ex);
+            }
         }
     }
 }

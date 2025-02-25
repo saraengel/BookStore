@@ -9,17 +9,17 @@ namespace BookStoreServer.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthService _authService ;
+        private readonly IAuthService _authService;
         public AuthController(IAuthService authService)
         {
-                _authService = authService ;
+            _authService = authService;
         }
         [HttpPost]
         [Route("/login")]
-        public ActionResult Login(LoginRequest request)
+        public async Task<ActionResult> Login(LoginRequest request)
         {
-            string token = _authService.Login(request);
-            return Ok(new {Token = token});
+            string token = await _authService.Login(request);
+            return Ok(new { Token = token });
         }
         [HttpPost]
         [Route("/logout")]
@@ -28,7 +28,5 @@ namespace BookStoreServer.Controllers
             _authService.Logout();
             return Ok();
         }
-
-
     }
 }

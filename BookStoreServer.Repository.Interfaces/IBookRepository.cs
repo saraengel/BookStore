@@ -11,13 +11,15 @@ namespace BookStoreServer.Repository.Interfaces
 {
     public interface IBookRepository
     {
-        public List<BookDTO> GetAllBooks();
-        public BookDTO? GetBook(int id);
-        public BookDTO AddBook(BaseEntityRequest<BookDTO> request);
-        public BookDTO? UpdateBook(BaseEntityRequest<BookDTO> request);
-        public BookDTO? UpdateBookPrice(BaseEntityRequest<BookDTO> request);
-        public void DeleteBook(int id);
-        public List<BookDTO> GetRangePriceOfBooks(RangePriceRequest request)
+        public Task<List<BookDTO>> GetAllBooksAsync();
+        public Task<BookDTO?> GetBookAsync(int id);
+        public Task<BookDTO> AddBookAsync(BaseEntityRequest<BookDTO> request);
+        public Task<BookDTO?> UpdateBookAsync(BaseEntityRequest<BookDTO> request);
+        public Task<BookDTO?> UpdateBookPriceAsync(BaseEntityRequest<BookDTO> request);
+        public Task DeleteBookAsync(int id);
+        public Task<List<BookDTO>> GetRangePriceOfBooksAsync(RangePriceRequest request);
         public Task<List<BookDTO>> GetOldBooksAsync(DateTime date);
+        public Task<List<BookDTO>> GetLowStockBooksAsync(CancellationToken stoppingToken);
+
     }
 }

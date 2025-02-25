@@ -9,7 +9,7 @@ namespace BookStoreServer.Repository.Interfaces
 {
     public interface IUserRepository
     {
-        public UserDTO GetUserByUserName(string userName);
-        public List<UserDTO> GetUsers();
+        public Task<UserDTO> GetUserByUserNameAsync(string userName);
+        public Task<List<UserDTO>> GetUsersAsync();
     }
 }
