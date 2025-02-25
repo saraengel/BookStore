@@ -11,7 +11,6 @@ using BookStoreServer.Api.Entities.Request;
 using BookStoreServer.Entities;
 using BookStoreServer.Entities.AppSettings;
 using BookStoreServer.Repository.Interfaces;
-using BookStoreServer.Service.Cache;
 using BookStoreServer.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
