@@ -31,11 +31,11 @@ namespace BookStoreServer.Service.Services
             _logger = logger;
         }
 
-        public async Task<string> Login(LoginRequest request)
+        public string Login(LoginRequest request)
         {
             try
             {
-                var user = await GetUser(request.Username);
+                var user = GetUser(request.Username);
                 if (user == null || !ValidatePassword(request.Password, user.Password))
                 {
                     _logger.LogWarning("Invalid login attempt for user: {Username}", request.Username);
@@ -59,9 +59,9 @@ namespace BookStoreServer.Service.Services
             _logger.LogInformation("User logged out successfully");
         }
 
-        private async Task<UserDTO> GetUser(string username)
+        private UserDTO GetUser(string username)
         {
-            return await _userRepository.GetUserByUserNameAsync(username);
+            return _userRepository.GetUserByUserName(username);
         }
 
         private bool ValidatePassword(string inputPassword, string storedPassword)

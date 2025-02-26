@@ -25,46 +25,46 @@ namespace BookStoreServer.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<BaseGetListResponse<BookDTO>>> GetAllAsync()
+        public ActionResult<BaseGetListResponse<BookDTO>> GetAll()
         {
-            return await _bookService.GetAllBooksAsync();
+            return _bookService.GetAllBooks();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<BaseGetEntityResponse<BookDTO>>> GetAsync([FromRoute] int id)
+        public ActionResult<BaseGetEntityResponse<BookDTO>> Get([FromRoute] int id)
         {
-            return await _bookService.GetBookAsync(id);
+            return _bookService.GetBook(id);
         }
 
         [HttpPost]
-        public async Task<ActionResult<BaseGetEntityResponse<BookDTO>>> AddAsync([FromBody] BaseEntityRequest<BookDTO> book)
+        public ActionResult<BaseGetEntityResponse<BookDTO>> Add([FromBody] BaseEntityRequest<BookDTO> book)
         {
-            return await _bookService.AddBookAsync(book);
+            return _bookService.AddBook(book);
         }
 
         [HttpPut]
-        public async Task<ActionResult<BaseGetEntityResponse<BookDTO>>> UpdateAsync([FromBody] BaseEntityRequest<BookDTO> request)
+        public ActionResult<BaseGetEntityResponse<BookDTO>> Update([FromBody] BaseEntityRequest<BookDTO> request)
         {
-            return await _bookService.UpdateBookAsync(request);
+            return _bookService.UpdateBook(request);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync([FromRoute] int id)
+        public IActionResult Delete([FromRoute] int id)
         {
-            await _bookService.DeleteBookAsync(id);
+            _bookService.DeleteBook(id);
             return NoContent();
         }
 
         [HttpPatch("updateBookPrice/{id}")]
-        public async Task<ActionResult<BaseGetEntityResponse<BookDTO>>> UpdateBookPriceAsync([FromBody] BaseEntityRequest<BookDTO> request)
+        public ActionResult<BaseGetEntityResponse<BookDTO>> UpdateBookAmount([FromBody] BaseEntityRequest<BookDTO> request)
         {
-            return await _bookService.UpdateBookPriceAsync(request);        
+            return _bookService.UpdateBookAmount(request);        
         }
 
         [HttpGet("price-range")]
-        public async Task<ActionResult<BaseGetListResponse<BookDTO>>> GetRangePriceOfBooksAsync([FromQuery] RangePriceRequest request)
+        public ActionResult<BaseGetListResponse<BookDTO>> GetRangePriceOfBooks([FromQuery] RangePriceRequest request)
         {
-            return await _bookService.GetRangePriceOfBooksAsync(request);
+            return _bookService.GetRangePriceOfBooks(request);
         }
     }
 }

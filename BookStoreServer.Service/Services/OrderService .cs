@@ -39,11 +39,11 @@ namespace BookStoreServer.Service.Services
             _eventAggregator = eventAggregator;
         }
 
-        public async Task<BaseGetListResponse<OrderDTO>> GetAllAsync()
+        public BaseGetListResponse<OrderDTO> GetAll()
         {
             try
             {
-                List<OrderDTO> orders = await _orderRepository.GetAllAsync();
+                List<OrderDTO> orders = _orderRepository.GetAll();
                 return new BaseGetListResponse<OrderDTO> { Entities = orders, Succeeded = true };
             }
             catch (Exception ex)
@@ -53,7 +53,7 @@ namespace BookStoreServer.Service.Services
             }
         }
 
-        public async Task<BaseGetEntityResponse<OrderDTO>> AddOrderAsync(OrderRequest request)
+        public BaseGetEntityResponse<OrderDTO> AddOrder(OrderRequest request)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace BookStoreServer.Service.Services
                 {
                     return new BaseGetEntityResponse<OrderDTO> { Succeeded = false, ErrorMessage = "Invalid order request." };
                 }
-                var result = await _orderRepository.AddOrderAsync(request);
+                var result = _orderRepository.AddOrder(request);
                 //await _orderHub.Clients.All.SendAsync("OrderValidated", order.Id);
                 _eventAggregator.Publish(result.orderCreatedEvent);
                 return new BaseGetEntityResponse<OrderDTO> { Entity = result.order, Succeeded = true };

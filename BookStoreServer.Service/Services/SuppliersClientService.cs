@@ -33,11 +33,10 @@ namespace BookStoreServer.Service.Services
                 _logger.LogError(ex, "Error starting SignalR connection.");
             }
         }
-
         public async Task SendMessageToServer(string message)
         {
-            _logger.LogInformation($"Sending message to server: {message}");
             await _connection.InvokeAsync("SendMessageToServer", message);
+            _logger.LogInformation($"Sending message to server: {message}");
         }
     }
 }

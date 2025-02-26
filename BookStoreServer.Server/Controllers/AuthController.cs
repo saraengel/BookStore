@@ -14,13 +14,15 @@ namespace BookStoreServer.Controllers
         {
             _authService = authService;
         }
+
         [HttpPost]
         [Route("/login")]
-        public async Task<ActionResult> Login(LoginRequest request)
+        public ActionResult Login(LoginRequest request)
         {
-            string token = await _authService.Login(request);
+            string token = _authService.Login(request);
             return Ok(new { Token = token });
         }
+
         [HttpPost]
         [Route("/logout")]
         public ActionResult Logout()

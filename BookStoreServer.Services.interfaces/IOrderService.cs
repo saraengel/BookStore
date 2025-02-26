@@ -11,8 +11,8 @@ namespace BookStoreServer.Services.Interfaces
 {
     public interface IOrderService
     {
-        public Task<BaseGetListResponse<OrderDTO>> GetAllAsync();
-        public Task<BaseGetEntityResponse<OrderDTO>> AddOrderAsync(OrderRequest request);
+        public BaseGetListResponse<OrderDTO> GetAll();
+        public BaseGetEntityResponse<OrderDTO> AddOrder(OrderRequest request);
 
     }
 }

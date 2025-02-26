@@ -13,9 +13,9 @@ namespace BookStoreServer.Repository.Interfaces
 {
     public interface IOrderRepository
     {
-        public Task<List<OrderDTO>> GetAllAsync();
-        public Task<AddOrderRsponse> AddOrderAsync(OrderRequest request);
-        public Task UpdateStatusAsync(int orderId, OrderStatus status);
-        public Task SetValidationAsync(int orderId, bool isValid);
+        public List<OrderDTO> GetAll();
+        public AddOrderRsponse AddOrder(OrderRequest request);
+        public void UpdateStatus(int orderId, OrderStatus status);
+        public void SetValidation(int orderId, bool isValid);
     }
 }

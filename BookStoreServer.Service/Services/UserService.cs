@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using BookStoreServer.Api.Entities;
 using BookStoreServer.Api.Entities.DTO;
+using BookStoreServer.Api.Entities.Request;
 using BookStoreServer.Api.Entities.Response;
+using BookStoreServer.Repository;
 using BookStoreServer.Repository.Interfaces;
 using BookStoreServer.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -23,11 +25,11 @@ namespace BookStoreServer.Service.Services
             _logger = logger;
         }
 
-        public async Task<BaseGetListResponse<UserDTO>> GetUsersAsync()
+        public BaseGetListResponse<UserDTO> GetUsers()
         {
             try
             {
-                List<UserDTO> users = await _userRepository.GetUsersAsync();
+                List<UserDTO> users =  _userRepository.GetUsers();
                 if (users == null || users.Count == 0)
                 {
                     return new BaseGetListResponse<UserDTO>
@@ -55,6 +57,20 @@ namespace BookStoreServer.Service.Services
                     Status = ResponseStatus.Failed,
                     Succeeded = false
                 };
+            }
+        }
+
+        public BaseGetEntityResponse<UserDTO> AddUser(BaseEntityRequest<UserDTO> request)
+        {
+            try
+            {
+                var user =  _userRepository.AddUser(request);
+                return new BaseGetEntityResponse<UserDTO> { Entity = user, Status = ResponseStatus.Created };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while adding a user.");
+                return new BaseGetEntityResponse<UserDTO> { Succeeded = false, ErrorMessage = ex.Message };
             }
         }
     }

@@ -25,11 +25,11 @@ namespace BookStoreServer.Service.Services
             _logger = logger;
         }
 
-        public async Task<BaseGetListResponse<BookDTO>> GetAllBooksAsync()
+        public BaseGetListResponse<BookDTO> GetAllBooks()
         {
             try
             {
-                List<BookDTO> books = await _bookRepository.GetAllBooksAsync();
+                List<BookDTO> books = _bookRepository.GetAllBooks();
                 return new BaseGetListResponse<BookDTO> { Entities = books };
             }
             catch (Exception ex)
@@ -39,11 +39,11 @@ namespace BookStoreServer.Service.Services
             }
         }
 
-        public async Task<BaseGetEntityResponse<BookDTO>> GetBookAsync(int id)
+        public BaseGetEntityResponse<BookDTO> GetBook(int id)
         {
             try
             {
-                BookDTO book = await _bookRepository.GetBookAsync(id);
+                BookDTO book = _bookRepository.GetBook(id);
                 return new BaseGetEntityResponse<BookDTO> { Entity = book };
             }
             catch (Exception ex)
@@ -53,12 +53,12 @@ namespace BookStoreServer.Service.Services
             }
         }
 
-        public async Task<BaseGetEntityResponse<BookDTO>> AddBookAsync(BaseEntityRequest<BookDTO> request)
+        public BaseGetEntityResponse<BookDTO> AddBook(BaseEntityRequest<BookDTO> request)
         {
             try
             {
                 ValidateBook(request.Entity);
-                BookDTO book = await _bookRepository.AddBookAsync(request);
+                BookDTO book =_bookRepository.AddBook(request);
                 return new BaseGetEntityResponse<BookDTO> { Entity = book, Status = ResponseStatus.Created };
             }
             catch (Exception ex)
@@ -68,12 +68,12 @@ namespace BookStoreServer.Service.Services
             }
         }
 
-        public async Task<BaseGetEntityResponse<BookDTO>> UpdateBookAsync(BaseEntityRequest<BookDTO> request)
+        public BaseGetEntityResponse<BookDTO> UpdateBook(BaseEntityRequest<BookDTO> request)
         {
             try
             {
                 ValidateBook(request.Entity);
-                BookDTO book = await _bookRepository.UpdateBookAsync(request);
+                BookDTO book = _bookRepository.UpdateBook(request);
                 return new BaseGetEntityResponse<BookDTO> { Entity = book };
             }
             catch (Exception ex)
@@ -83,15 +83,15 @@ namespace BookStoreServer.Service.Services
             }
         }
 
-        public async Task<BaseGetEntityResponse<BookDTO>> UpdateBookPriceAsync(BaseEntityRequest<BookDTO> request)
+        public BaseGetEntityResponse<BookDTO> UpdateBookAmount(BaseEntityRequest<BookDTO> request)
         {
             try
             {
-                if (request.Entity.Price <= 0)
+                if (request.Entity.Amount <= 0)
                 {
-                    throw new ArgumentException("Price must be greater than 0.");
+                    throw new ArgumentException("Amount must be greater than 0.");
                 }
-                BookDTO book = await _bookRepository.UpdateBookPriceAsync(request);
+                BookDTO book = _bookRepository.UpdateBookAmount(request);
                 return new BaseGetEntityResponse<BookDTO> { Entity = book };
             }
             catch (Exception ex)
@@ -101,11 +101,11 @@ namespace BookStoreServer.Service.Services
             }
         }
 
-        public async Task DeleteBookAsync(int id)
+        public void DeleteBook(int id)
         {
             try
             {
-                await _bookRepository.DeleteBookAsync(id);
+                _bookRepository.DeleteBook(id);
             }
             catch (Exception ex)
             {
@@ -114,11 +114,11 @@ namespace BookStoreServer.Service.Services
             }
         }
 
-        public async Task<BaseGetListResponse<BookDTO>> GetRangePriceOfBooksAsync(RangePriceRequest request)
+        public BaseGetListResponse<BookDTO> GetRangePriceOfBooks(RangePriceRequest request)
         {
             try
             {
-                List<BookDTO> books = await _bookRepository.GetRangePriceOfBooksAsync(request);
+                List<BookDTO> books = _bookRepository.GetRangePriceOfBooks(request);
                 return new BaseGetListResponse<BookDTO> { Entities = books };
             }
             catch (Exception ex)

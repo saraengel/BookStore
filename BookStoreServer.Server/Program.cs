@@ -44,7 +44,7 @@ namespace BookStoreServer
 
             var app = builder.Build();
 
-            // Apply database migrations
+            //Apply database migrations
             //using (var scope = app.Services.CreateScope())
             //{
             //    var db = scope.ServiceProvider.GetRequiredService<BookStorContext>();

@@ -10,13 +10,19 @@ services:
       - "1433:1433"
     networks:
       - app_network
+
+
   bookstoreserver:
     build:
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
+      - "5001:5001"
     networks:
       - app_network
+    volumes:
+      - .:/app  
+      - ~/.nuget/packages:/root/.nuget/packages 
     environment:
       - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=BookStore;User Id=sa;Password=Str0ngP@ss!;Encrypt=False;TrustServerCertificate=True;
       - DOTNET_MODIFIABLE_ASSEMBLIES=Debug

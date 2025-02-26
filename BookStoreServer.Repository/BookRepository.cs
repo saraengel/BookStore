@@ -26,63 +26,63 @@ namespace BookStoreServer.Repository
             _mapper = mapper;
         }
 
-        public async Task<List<BookDTO>> GetAllBooksAsync()
+        public List<BookDTO> GetAllBooks()
         {
-            var books = await _db.Books.ToListAsync();
+            var books = _db.Books.ToList();
             return books.Count == 0 ? null : _mapper.Map<List<BookDTO>>(books);
         }
 
-        public async Task<BookDTO?> GetBookAsync(int id)
+        public BookDTO? GetBook(int id)
         {
-            var book = await _db.Books.SingleOrDefaultAsync(b => b.Id == id);
+            var book = _db.Books.SingleOrDefault(b => b.Id == id);
             return book == null ? null : _mapper.Map<BookDTO>(book);
         }
 
-        public async Task<BookDTO> AddBookAsync(BaseEntityRequest<BookDTO> request)
+        public BookDTO AddBook(BaseEntityRequest<BookDTO> request)
         {
             var book = _mapper.Map<Book>(request.Entity);
-            await _db.Books.AddAsync(book);
-            await _db.SaveChangesAsync();
+            _db.Books.Add(book);
+            _db.SaveChanges();
             return _mapper.Map<BookDTO>(book);
         }
 
-        public async Task<BookDTO?> UpdateBookAsync(BaseEntityRequest<BookDTO> request)
+        public BookDTO? UpdateBook(BaseEntityRequest<BookDTO> request)
         {
-            var book = await _db.Books.FindAsync(request.Entity.Id);
+            var book = _db.Books.Find(request.Entity.Id);
             if (book == null) return null;
             _mapper.Map(request.Entity, book);
-            await _db.SaveChangesAsync();
+            _db.SaveChanges();
             return _mapper.Map<BookDTO>(book);
         }
 
-        public async Task<BookDTO?> UpdateBookPriceAsync(BaseEntityRequest<BookDTO> request)
+        public BookDTO? UpdateBookAmount(BaseEntityRequest<BookDTO> request)
         {
-            var book = await _db.Books.FindAsync(request.Entity.Id);
+            var book = _db.Books.Find(request.Entity.Id);
             if (book == null) return null;
-            book.Price = request.Entity.Price;
-            await _db.SaveChangesAsync();
+            book.Amount = request.Entity.Amount;
+            _db.SaveChanges();
             return _mapper.Map<BookDTO>(book);
         }
 
-        public async Task DeleteBookAsync(int id)
+        public void DeleteBook(int id)
         {
-            var book = await _db.Books.SingleOrDefaultAsync(b => b.Id == id);
+            var book =  _db.Books.SingleOrDefault(b => b.Id == id);
             if (book == null) return;
             _db.Books.Remove(book);
-            await _db.SaveChangesAsync();
+            _db.SaveChanges();
         }
 
-        public async Task<List<BookDTO>> GetRangePriceOfBooksAsync(RangePriceRequest request)
+        public List<BookDTO> GetRangePriceOfBooks(RangePriceRequest request)
         {
-            var books = await _db.Books
+            var books = _db.Books
                 .Where(b => b.Price > request.MinPrice && b.Price < request.MaxPrice)
-                .ToListAsync();
+                .ToList();
             return books.Count == 0 ? null : _mapper.Map<List<BookDTO>>(books);
         }
 
-        public async Task<List<BookDTO>> GetOldBooksAsync(DateTime date)
+        public List<BookDTO> GetOldBooks(DateTime date)
         {
-            var books = await _db.Books.Where(b => b.PublishedDate < date).ToListAsync();
+            var books = _db.Books.Where(b => b.PublishedDate < date).ToList();
             return _mapper.Map<List<BookDTO>>(books);
         }
 

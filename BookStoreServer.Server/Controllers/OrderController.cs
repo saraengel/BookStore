@@ -20,19 +20,19 @@ namespace BookStoreServer.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<BaseGetListResponse<OrderDTO>>> Get()
+        public ActionResult<BaseGetListResponse<OrderDTO>> Get()
         {
-            return await _orderService.GetAllAsync();
+            return _orderService.GetAll();
         }
 
         [HttpPost]
-        public async Task<ActionResult<BaseGetEntityResponse<OrderDTO>>> Set([FromBody] OrderRequest request)
+        public ActionResult<BaseGetEntityResponse<OrderDTO>> Set([FromBody] OrderRequest request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return await _orderService.AddOrderAsync(request);
+            return _orderService.AddOrder(request);
         }
     }
 }

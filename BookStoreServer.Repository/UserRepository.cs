@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using BookStoreServer.Api.Entities.DTO;
+using BookStoreServer.Api.Entities.Request;
 using BookStoreServer.Model.Contexts;
 using BookStoreServer.Model.Models;
 using BookStoreServer.Repository.Interfaces;
@@ -23,17 +24,24 @@ namespace BookStoreServer.Repository
             _mapper = mapper;
         }
 
-        public async Task<UserDTO> GetUserByUserNameAsync(string userName)
+        public UserDTO GetUserByUserName(string userName)
         {
-            var user = await _db.Users.SingleOrDefaultAsync(u => u.UserName == userName);
+            var user = _db.Users.SingleOrDefault(u => u.UserName == userName);
             if (user == null) { return null; }
             return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<List<UserDTO>> GetUsersAsync()
+        public List<UserDTO> GetUsers()
         {
-            var users = await _db.Users.ToListAsync();
+            var users = _db.Users.ToList();
             return _mapper.Map<List<UserDTO>>(users);
+        }
+        public UserDTO AddUser(BaseEntityRequest<UserDTO> request)
+        {
+            var user = _mapper.Map<User>(request.Entity);
+            _db.Users.Add(user);
+            _db.SaveChanges();
+            return _mapper.Map<UserDTO>(user);
         }
     }
 }

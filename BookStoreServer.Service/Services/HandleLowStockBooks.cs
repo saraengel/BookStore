@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BookStoreServer.Api.Entities.DTO;
 using BookStoreServer.Repository.Interfaces;
+using BookStoreServer.Services.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,7 +24,7 @@ namespace BookStoreServer.Service.Services
         private readonly SuppliersClientService _suppliersClientService;
         private readonly EmailService _emailService;
 
-        public HandleLowStockBooks(IServiceProvider serviceProvider, SuppliersClientService suppliersClientService, ILogger<HandleLowStockBooks> logger, IStoreHub storeHub, EmailService emailService)
+        public HandleLowStockBooks(IServiceProvider serviceProvider, SuppliersClientService suppliersClientService, ILogger<HandleLowStockBooks> logger, IStoreHub storeHub, EmailService  emailService)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
@@ -45,10 +46,10 @@ namespace BookStoreServer.Service.Services
                 //await Task.Delay(TimeSpan.FromDays(7), stoppingToken);
                 await Task.Delay(TimeSpan.FromSeconds(6), stoppingToken);
 
-                var checkLowStockBooksTask = CheckLowStockBooks(stoppingToken);
-                var notifySuppliersTask = NotifySuppliers(stoppingToken);
+                var checkLowStockBooksTask = Task.Run(()=> CheckLowStockBooks(stoppingToken));
+                var notifySuppliersTask = Task.Run(() => NotifySuppliers(stoppingToken));
 
-                await Task.WhenAll(checkLowStockBooksTask, notifySuppliersTask);
+                await Task.WhenAll(checkLowStockBooksTask , notifySuppliersTask);
 
                 _logger.LogInformation("Treatment ended, low of stock.");
             }

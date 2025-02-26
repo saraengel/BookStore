@@ -1,4 +1,5 @@
 ﻿using BookStoreServer.Api.Entities.DTO;
+using BookStoreServer.Api.Entities.Request;
 using BookStoreServer.Api.Entities.Response;
 using BookStoreServer.Service;
 using BookStoreServer.Services.Interfaces;
@@ -21,9 +22,14 @@ namespace BookStoreServer.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<BaseGetListResponse<UserDTO>>> GetUsers()
+        public ActionResult<BaseGetListResponse<UserDTO>> GetUsers()
         {
-           return await _userService.GetUsersAsync();         
+           return _userService.GetUsers();         
+        }
+        [HttpPost]
+        public BaseGetEntityResponse<UserDTO> AddAsync([FromBody] BaseEntityRequest<UserDTO> request)
+        {
+            return _userService.AddUser(request);
         }
     }
 }

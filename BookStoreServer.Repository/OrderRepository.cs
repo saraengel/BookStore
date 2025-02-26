@@ -31,11 +31,11 @@ namespace BookStoreServer.Repository
             _logger = logger;
         }
 
-        public async Task<List<OrderDTO>> GetAllAsync()
+        public List<OrderDTO> GetAll()
         {
             try
             {
-                var orders = await _db.Orders.ToListAsync();
+                var orders = _db.Orders.ToList();
                 return _mapper.Map<List<OrderDTO>>(orders);
             }
             catch (Exception ex)
@@ -45,13 +45,13 @@ namespace BookStoreServer.Repository
             }
         }
 
-        public async Task<AddOrderRsponse> AddOrderAsync(OrderRequest request)
+        public AddOrderRsponse AddOrder(OrderRequest request)
         {
             try
             {
 
-                var bookAndUserOrder = await _db.Books.Join(_db.Users, b => b.Title == request.BookTitle && b.Amount >= request.Amount, u => u.Id == request.UserId, (book, user) => new { book, user })
-                    .SingleOrDefaultAsync();
+                var bookAndUserOrder = _db.Books.Join(_db.Users, b => b.Title == request.BookTitle && b.Amount >= request.Amount, u => u.Id == request.UserId, (book, user) => new { book, user })
+                    .SingleOrDefault();
 
 
                 if (bookAndUserOrder == null)
@@ -70,9 +70,9 @@ namespace BookStoreServer.Repository
 
                 bookAndUserOrder.book.Amount -= request.Amount;
 
-                await _db.Orders.AddAsync(order);
+                _db.Orders.Add(order);
                 _db.Books.Update(bookAndUserOrder.book);
-                await _db.SaveChangesAsync();
+                _db.SaveChanges();
                 var orderCreatedEvent = new OrderCreatedEvent(request.UserId,bookAndUserOrder.user.UserName,bookAndUserOrder.user.Email, bookAndUserOrder.book.Title);
                 var orderDTO = _mapper.Map<OrderDTO>(order);
                 return new AddOrderRsponse() { orderCreatedEvent = orderCreatedEvent,order = orderDTO};
@@ -84,11 +84,11 @@ namespace BookStoreServer.Repository
             }
         }
 
-        public async Task UpdateStatusAsync(int orderId, OrderStatus status)
+        public void UpdateStatus(int orderId, OrderStatus status)
         {
             try
             {
-                var order = await _db.Orders.FindAsync(orderId);
+                var order = _db.Orders.Find(orderId);
                 if (order == null)
                 {
                     _logger.LogWarning("Order not found: {OrderId}", orderId);
@@ -96,7 +96,7 @@ namespace BookStoreServer.Repository
                 }
 
                 order.Status = status;
-                await _db.SaveChangesAsync();
+                _db.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -105,11 +105,11 @@ namespace BookStoreServer.Repository
             }
         }
 
-        public async Task SetValidationAsync(int orderId, bool isValid)
+        public void SetValidation(int orderId, bool isValid)
         {
             try
             {
-                var order = await _db.Orders.FindAsync(orderId);
+                var order = _db.Orders.Find(orderId);
                 if (order == null)
                 {
                     _logger.LogWarning("Order not found: {OrderId}", orderId);
@@ -117,7 +117,7 @@ namespace BookStoreServer.Repository
                 }
 
                 order.IsValid = isValid;
-                await _db.SaveChangesAsync();
+                _db.SaveChanges();
             }
             catch (Exception ex)
             {
