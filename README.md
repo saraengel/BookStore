@@ -1,61 +1,50 @@
-# BookStore# BookStore
+# BookStoreServer
 
-## Overview
-The `BookStore` project is designed to manage book inventory and notify suppliers when stock is low. It includes services for handling low stock books, notifying suppliers, and managing book data.
+BookStoreServer is a backend server application for managing a book store. It provides functionalities for user authentication, book services, order processing, and real-time notifications.
 
-## Project Structure
-- **BookStoreServer.Service**: Contains the services for handling low stock books and notifying suppliers.
-- **BookStoreServer.Api.Entities**: Contains the data transfer objects (DTOs) for the project.
-- **BookStoreServer.Repository.Interfaces**: Contains the repository interfaces for accessing book data.
+## Features
 
-## Key Components
-### HandleLowStockBooks
-This service runs in the background and periodically checks for low stock books. It notifies suppliers when a book's stock is low.
-
-#### Key Methods:
-- `ExecuteAsync(CancellationToken stoppingToken)`: Starts the service and periodically checks for low stock books.
-- `CheckLowStockBooks()`: Checks the repository for books that are low in stock and adds them to a concurrent bag.
-- `NotifySuppliers()`: Notifies suppliers about low stock books using the `IStoreHub` interface.
-
-### SuppliersClientService
-This service manages the connection to the suppliers and sends messages to the server.
-
-#### Key Methods:
-- `StartAsync()`: Starts the connection to the suppliers.
-- `SendMessageToServer(string message)`: Sends a message to the server.
-
-### BookDTO
-This data transfer object represents a book in the system.
-
-#### Key Properties:
-- `Id`: The unique identifier for the book.
-- `Title`: The title of the book.
-- `Description`: A description of the book.
-- `PublishedDate`: The date the book was published.
-- `Price`: The price of the book.
-- `Amount`: The amount of the book in stock.
-
-### IStoreHub
-This interface defines the method for sending notifications to suppliers.
-
-#### Key Methods:
-- `SendSuppliersNotification(string title)`: Sends a notification to suppliers.
+- **User Authentication**: Supports JWT-based authentication.
+- **Book Management**: Services for managing books in the store.
+- **Order Processing**: Handles order creation, updates, and notifications.
+- **Real-Time Notifications**: Uses SignalR for real-time updates and notifications.
+- **API Documentation**: Integrated with Swagger for API documentation.
 
 ## Getting Started
-1. Clone the repository.
-2. Open the solution in Visual Studio 2022.
-3. Build the solution to restore the dependencies.
-4. Run the project.
 
-## Dependencies
-- .NET 6.0
-- Microsoft.Extensions.Hosting
-- Microsoft.Extensions.DependencyInjection
-- Microsoft.Extensions.Logging
-- Microsoft.AspNetCore.SignalR
+### Prerequisites
+
+- Docker
+- Docker Compose
+
+### Installation
+
+1. Clone the repository:  
+    git clone https://github.com/your-repo/BookStoreServer.git
+    cd BookStoreServer
+
+2. Run the application using Docker Compose:
+    docker-compose up --build
+
+### Running the Application
+    
+1. The server will start at `http://0.0.0.0:5000`.
+
+### API Documentation
+
+- Access the Swagger UI at `http://localhost:5000/swagger`.
+
+## Configuration
+
+The application uses `appsettings.json` for configuration. Key settings include:
+
+- **Jwt**: Settings for JWT authentication.
+- **EmailSettings**: Configuration for email services.
 
 ## Contributing
-Contributions are welcome! Please submit a pull request or open an issue to discuss your changes.
+
+Contributions are welcome! Please open an issue or submit a pull request.
 
 ## License
+
 This project is licensed under the MIT License.
