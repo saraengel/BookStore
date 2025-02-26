@@ -21,13 +21,15 @@ namespace BookStoreServer.Service.Services
         private readonly ConcurrentBag<BookDTO> _lowStockBooks = new ConcurrentBag<BookDTO>();
         private readonly IStoreHub _storeHub;
         private readonly SuppliersClientService _suppliersClientService;
+        private readonly EmailService _emailService;
 
-        public HandleLowStockBooks(IServiceProvider serviceProvider, SuppliersClientService suppliersClientService, ILogger<HandleLowStockBooks> logger, IStoreHub storeHub)
+        public HandleLowStockBooks(IServiceProvider serviceProvider, SuppliersClientService suppliersClientService, ILogger<HandleLowStockBooks> logger, IStoreHub storeHub, EmailService emailService)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
             _suppliersClientService = suppliersClientService;
             _storeHub = storeHub;
+            _emailService = emailService;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

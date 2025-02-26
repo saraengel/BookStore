@@ -8,7 +8,8 @@ using AutoMapper;
 using BookStoreServer.Api.Entities;
 using BookStoreServer.Api.Entities.DTO;
 using BookStoreServer.Api.Entities.Request;
-using BookStoreServer.Entities;
+using BookStoreServer.Api.Entities.Response;
+using BookStoreServer.Entities.Events;
 using BookStoreServer.Model.Contexts;
 using BookStoreServer.Model.Models;
 using BookStoreServer.Repository.Interfaces;
@@ -44,35 +45,37 @@ namespace BookStoreServer.Repository
             }
         }
 
-        public async Task<OrderDTO> AddOrderAsync(OrderRequest request)
+        public async Task<AddOrderRsponse> AddOrderAsync(OrderRequest request)
         {
             try
             {
-                var book = await _db.Books
-                    .Where(b => b.Title == request.BookTitle && b.Amount >= request.Amount)
+
+                var bookAndUserOrder = await _db.Books.Join(_db.Users, b => b.Title == request.BookTitle && b.Amount >= request.Amount, u => u.Id == request.UserId, (book, user) => new { book, user })
                     .SingleOrDefaultAsync();
 
-                if (book == null)
+
+                if (bookAndUserOrder == null)
                 {
                     throw new InvalidOperationException("Book not found or insufficient amount");
                 }
 
-                var order = new Order
+                var order = new Order()
                 {
-                    BookId = book.Id,
-                    UserId = request.UserId,
+                    BookId = bookAndUserOrder.book.Id,
+                    UserId = bookAndUserOrder.user.Id,
                     Amount = request.Amount,
                     Status = OrderStatus.Pending,
                     IsValid = true
                 };
 
-                book.Amount -= request.Amount;
+                bookAndUserOrder.book.Amount -= request.Amount;
 
                 await _db.Orders.AddAsync(order);
-                _db.Books.Update(book);
+                _db.Books.Update(bookAndUserOrder.book);
                 await _db.SaveChangesAsync();
-
-                return _mapper.Map<OrderDTO>(order);
+                var orderCreatedEvent = new OrderCreatedEvent(request.UserId,bookAndUserOrder.user.UserName,bookAndUserOrder.user.Email, bookAndUserOrder.book.Title);
+                var orderDTO = _mapper.Map<OrderDTO>(order);
+                return new AddOrderRsponse() { orderCreatedEvent = orderCreatedEvent,order = orderDTO};
             }
             catch (Exception ex)
             {

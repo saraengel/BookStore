@@ -6,6 +6,7 @@ using System.Text;
 using BookStoreServer.Entities.AppSettings;
 using BookStoreServer.Service;
 using BookStoreServer.Model.Contexts;
+using BookStoreServer.CommonServices;
 
 
 
@@ -36,11 +37,10 @@ namespace BookStoreServer
             });
             builder.Services.AddSignalR();
             builder.Services.AddSingleton<IConfiguration>(config);
-            builder.Services.Configure<JWTSettings>(config.GetSection("Jwt"));
+            builder.Services.Configure<JWTSettings>(config.GetSection("Jwt")); 
+            builder.Services.Configure<EmailSettings>(config.GetSection("EmailSettings")); 
+            builder.Services.AddSingleton<EventAggregator>();
             builder.Services.ConfigureServices(config);
-
-            // Enable Serilog for logging
-            //builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(ctx.Configuration));
 
             var app = builder.Build();
 

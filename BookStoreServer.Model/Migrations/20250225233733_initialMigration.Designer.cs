@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookStoreServer.Model.Migrations
 {
     [DbContext(typeof(BookStorContext))]
-    [Migration("20250223171445_initialMigration")]
+    [Migration("20250225233733_initialMigration")]
     partial class initialMigration
     {
         /// <inheritdoc />
@@ -90,6 +90,10 @@ namespace BookStoreServer.Model.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
                         .IsRequired()

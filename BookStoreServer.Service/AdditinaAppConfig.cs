@@ -58,6 +58,8 @@ namespace BookStoreServer.Service
     });
             });
             services.AddHostedService<HandleLowStockBooks>();
+            services.AddSingleton<EmailService>();
+            //services.AddScoped<IEmailService, EmailService>();
             services.ConfigureRepositoryServices(config);
         }
         public static void ConfigurApp(this IApplicationBuilder app, IWebHostEnvironment env)

@@ -8,6 +8,8 @@ using BookStoreServer.Api.Entities;
 using BookStoreServer.Api.Entities.DTO;
 using BookStoreServer.Api.Entities.Request;
 using BookStoreServer.Api.Entities.Response;
+using BookStoreServer.CommonServices;
+using BookStoreServer.Entities.Events;
 using BookStoreServer.Model.Models;
 using BookStoreServer.Repository;
 using BookStoreServer.Repository.Interfaces;
@@ -26,13 +28,15 @@ namespace BookStoreServer.Service.Services
         private readonly IBookRepository _bookRepository;
         private readonly IHubContext<StoreHub> _orderHub;
         private readonly ILogger<OrderService> _logger;
+        private readonly EventAggregator _eventAggregator;
 
-        public OrderService(IOrderRepository orderRepository, IBookRepository bookRepository, IHubContext<StoreHub> orderHub, ILogger<OrderService> logger)
+        public OrderService(IOrderRepository orderRepository, IBookRepository bookRepository, IHubContext<StoreHub> orderHub, ILogger<OrderService> logger, EventAggregator eventAggregator)
         {
             _orderRepository = orderRepository;
             _bookRepository = bookRepository;
             _orderHub = orderHub;
             _logger = logger;
+            _eventAggregator = eventAggregator;
         }
 
         public async Task<BaseGetListResponse<OrderDTO>> GetAllAsync()
@@ -58,11 +62,10 @@ namespace BookStoreServer.Service.Services
                 {
                     return new BaseGetEntityResponse<OrderDTO> { Succeeded = false, ErrorMessage = "Invalid order request." };
                 }
-
-                OrderDTO order = await _orderRepository.AddOrderAsync(request);
+                var result = await _orderRepository.AddOrderAsync(request);
                 //await _orderHub.Clients.All.SendAsync("OrderValidated", order.Id);
-
-                return new BaseGetEntityResponse<OrderDTO> { Entity = order, Succeeded = true };
+                _eventAggregator.Publish(result.orderCreatedEvent);
+                return new BaseGetEntityResponse<OrderDTO> { Entity = result.order, Succeeded = true };
             }
             catch (Exception ex)
             {

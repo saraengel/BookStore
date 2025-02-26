@@ -6,7 +6,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using BookStoreServer.Api.Entities.DTO;
-using BookStoreServer.Api.Entities.Models;
 using BookStoreServer.Api.Entities.Request;
 using BookStoreServer.Entities;
 using BookStoreServer.Entities.AppSettings;

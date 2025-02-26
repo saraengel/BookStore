@@ -12,6 +12,6 @@ namespace BookStoreServer.Api.Entities.DTO
         public string? UserName { get; set; }
         public string? Password { get; set; }
         public int Amount { get; set; }
-
+        public string Email { get; set; }
     }
 }
